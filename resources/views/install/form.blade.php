@@ -278,6 +278,10 @@
                         <div class="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-sm text-slate-700">
                             {!! $helpText !!}
                         </div>
+                        @else
+                        <div class="mt-4 p-4 rounded-xl bg-red-100 border border-red-200 text-sm text-red-700">
+                            Debug: helpText is empty. toolSlug={{ $toolSlug ?? 'null' }}
+                        </div>
                         @endif
                     </form>
                 </div>
