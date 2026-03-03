@@ -77,6 +77,11 @@
         </header>
 
         <main class="flex-1 max-w-2xl w-full mx-auto px-4 py-8 md:py-12">
+            {{-- DEBUG INFO --}}
+            <div class="mb-4 p-2 bg-yellow-200 text-black text-xs font-mono">
+                DEBUG: toolSlug={{ $toolSlug ?? 'null' }} | helpText={{ $helpText ? 'SET' : 'EMPTY' }}
+            </div>
+
             {{-- Alerts --}}
             @if(session('success'))
                 <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 animate-slide-up" role="alert">
