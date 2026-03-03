@@ -273,6 +273,6 @@ class InstallController extends Controller
     {
         $slug = $request->old('tool_slug') ?? $request->query('tool');
         $registry = array_keys(config('tools.registry', []));
-        return $slug && in_array($slug, $registry, true) ? $slug : ($registry[0] ?? 'faq');
+        return $slug && in_array($slug, $registry, true) ? $slug : ($registry[0] ?? 'related-posts');
     }
 }

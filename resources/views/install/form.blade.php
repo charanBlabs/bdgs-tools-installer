@@ -77,11 +77,6 @@
         </header>
 
         <main class="flex-1 max-w-2xl w-full mx-auto px-4 py-8 md:py-12">
-            {{-- DEBUG INFO --}}
-            <div class="mb-4 p-2 bg-yellow-200 text-black text-xs font-mono">
-                DEBUG: toolSlug={{ $toolSlug ?? 'null' }} | helpText={{ $helpText ? 'SET' : 'EMPTY' }}
-            </div>
-
             {{-- Alerts --}}
             @if(session('success'))
                 <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 animate-slide-up" role="alert">
@@ -248,7 +243,7 @@
                         <input type="hidden" name="bd_api_key" value="{{ $bdApiKey ?? '' }}">
                         <div>
                             <label for="tool_slug" class="block text-sm font-medium text-slate-700 mb-1.5">Tool</label>
-                            <select id="tool_slug" name="tool_slug" required class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all bg-white" onchange="var url = new URL(window.location.href); url.searchParams.set('tool', this.value); window.location.href = url.toString();">
+                            <select id="tool_slug" name="tool_slug" required class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all bg-white" onchange="console.log('Dropdown changed to:', this.value); var url = new URL(window.location.href); url.searchParams.set('tool', this.value); console.log('Navigating to:', url.toString()); window.location.href = url.toString();">
                                 @foreach($tools as $slug => $config)
                                     <option value="{{ $slug }}" {{ ($toolSlug ?? '') === $slug ? 'selected' : '' }}>{{ $config['name'] ?? $slug }} ({{ $config['type'] ?? 'service' }})</option>
                                 @endforeach
@@ -282,10 +277,6 @@
                         @if(!empty($helpText))
                         <div class="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-sm text-slate-700">
                             {!! $helpText !!}
-                        </div>
-                        @else
-                        <div class="mt-4 p-4 rounded-xl bg-red-100 border border-red-200 text-sm text-red-700">
-                            Debug: helpText is empty. toolSlug={{ $toolSlug ?? 'null' }}
                         </div>
                         @endif
                     </form>
