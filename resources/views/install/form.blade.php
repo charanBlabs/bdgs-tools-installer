@@ -245,7 +245,7 @@
                             <label for="tool_slug" class="block text-sm font-medium text-slate-700 mb-1.5">Tool</label>
                             <select id="tool_slug" name="tool_slug" required class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all bg-white">
                                 @foreach($tools as $slug => $config)
-                                    <option value="{{ $slug }}" data-help="{{ e($config['help_text'] ?? '') }}" {{ ($toolSlug ?? '') === $slug ? 'selected' : '' }}>{{ $config['name'] ?? $slug }} ({{ $config['type'] ?? 'service' }})</option>
+                                    <option value="{{ $slug }}" data-help='{{ ($config['help_text'] ?? '') }}' {{ ($toolSlug ?? '') === $slug ? 'selected' : '' }}>{{ $config['name'] ?? $slug }} ({{ $config['type'] ?? 'service' }})</option>
                                 @endforeach
                             </select>
                         </div>
