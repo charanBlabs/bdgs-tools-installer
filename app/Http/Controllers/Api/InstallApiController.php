@@ -139,7 +139,9 @@ class InstallApiController extends Controller
         }
         if ($plainInstall && $enforceLicense && $licenseToken) {
             $checkUrl = rtrim(config('app.url', $request->getSchemeAndHttpHost()), '/') . '/api/license/check';
-            $assets = $this->plainLicenseEnforcer->wrapPhpAssetsWithLicenseCheck($assets, $checkUrl, $licenseToken);
+            
+            // Wrap each widget's PHP assets based on its viewport (admin or front)
+            $assets = $this->wrapWidgetsByViewport($assets, $checkUrl, $licenseToken, $registry);
         }
         $payloads = $this->payloadBuilder->buildWidgetPayloads($toolSlug, $assets);
         if (empty($payloads)) {
@@ -193,5 +195,55 @@ class InstallApiController extends Controller
             $path = storage_path('app/plugin-assets');
         }
         return $this->payloadBuilder->readAssetsFromPath($path);
+    }
+
+    /**
+     * Wrap each widget's PHP assets based on its viewport.
+     * Admin widgets show license warnings, frontend widgets skip the warning.
+     *
+     * @param array<string, string> $assets
+     * @param string $checkUrl
+     * @param string $licenseToken
+     * @param array $registry
+     * @return array<string, string>
+     */
+    protected function wrapWidgetsByViewport(array $assets, string $checkUrl, string $licenseToken, array $registry): array
+    {
+        $widgets = $registry['widgets'] ?? [];
+        
+        // Build a map of widget_data_key => viewport
+        $widgetViewportMap = [];
+        foreach ($widgets as $widget) {
+            $dataKey = $widget['widget_data_key'] ?? null;
+            $viewport = $widget['widget_viewport'] ?? 'admin'; // default to admin
+            if ($dataKey) {
+                $widgetViewportMap[$dataKey] = $viewport;
+            }
+        }
+        
+        // Wrap each asset based on its widget's viewport
+        $out = [];
+        foreach ($assets as $key => $content) {
+            // Find which widget this asset belongs to
+            $viewport = $widgetViewportMap[$key] ?? 'admin';
+            
+            if ($this->isPhpAsset($key)) {
+                $out[$key] = $this->plainLicenseEnforcer->wrapPhpAssetsWithLicenseCheck(
+                    [$key => $content],
+                    $checkUrl,
+                    $licenseToken,
+                    $viewport
+                )[$key];
+            } else {
+                $out[$key] = $content;
+            }
+        }
+        
+        return $out;
+    }
+
+    private function isPhpAsset(string $key): bool
+    {
+        return str_ends_with(strtolower($key), '.php');
     }
 }
