@@ -274,13 +274,9 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             Install
                         </button>
-                        @if(($toolSlug ?? '') === 'faq')
+                        @if(!empty($helpText))
                         <div class="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-sm text-slate-700">
-                            <p class="font-medium mb-1">FAQ: Updating code &amp; admin panel</p>
-                            <ul class="list-disc list-inside space-y-0.5 text-slate-600">
-                                <li><strong>New code not showing?</strong> After editing <code class="bg-slate-200 px-1 rounded">plugin-assets/</code>, run <code class="bg-slate-200 px-1 rounded">php artisan tools:encrypt faq</code> then run Install (or Update existing) here so the new payload is sent to BD.</li>
-                                <li><strong>Works on front but not in admin?</strong> Set the license token so it is available in admin too: e.g. <code class="bg-slate-200 px-1 rounded">define('FAQ_LICENSE_TOKEN', 'your-token');</code> or <code class="bg-slate-200 px-1 rounded">$GLOBALS['faq_license_token'] = 'your-token';</code> in a file that loads for both front and admin (e.g. theme functions or global include).</li>
-                            </ul>
+                            {!! $helpText !!}
                         </div>
                         @endif
                     </form>

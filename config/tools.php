@@ -6,6 +6,7 @@
  * - version: developer-set (e.g. 1, 1.1, 2). Minor = 1.1; major = 2.
  * - product_type (BDGS): service | quick_service | flagship_service | tool.
  *   Installer usage: Free → quick_service; Fixed Price → any; Subscription → service/flagship_service (sometimes tool).
+ * - help_text: Optional help text shown after install button in installer form.
  */
 return [
     'registry' => [
@@ -20,6 +21,11 @@ return [
                 'fetch_keys' => [], // asset keys fetched from server (HTML/JS); empty = use server file list from DB
                 'css_plain' => true, // true = leave CSS as plain; false = wrap in PHP base64 decode
             ],
+            'help_text' => '<p class="font-medium mb-1">FAQ: Updating code &amp; admin panel</p>
+                            <ul class="list-disc list-inside space-y-0.5 text-slate-600">
+                                <li><strong>New code not showing?</strong> After editing <code class="bg-slate-200 px-1 rounded">plugin-assets/</code>, run <code class="bg-slate-200 px-1 rounded">php artisan tools:encrypt faq</code> then run Install (or Update existing) here so the new payload is sent to BD.</li>
+                                <li><strong>Works on front but not in admin?</strong> Set the license token so it is available in admin too: e.g. <code class="bg-slate-200 px-1 rounded">define(\'FAQ_LICENSE_TOKEN\', \'your-token\');</code> or <code class="bg-slate-200 px-1 rounded">$GLOBALS[\'faq_license_token\'] = \'your-token\';</code> in a file that loads for both front and admin (e.g. theme functions or global include).</li>
+                            </ul>',
             'widgets' => [
                 [
                     'widget_name' => 'FAQ Management Plugin',
@@ -45,6 +51,7 @@ return [
             'type' => 'service',
             'version' => '1.0',
             'product_type' => 'quick_service',
+            'help_text' => null,
             'widgets' => [
                 [
                     'widget_name' => 'Weather Widget',
@@ -61,6 +68,7 @@ return [
             'type' => 'service',
             'version' => '1.0',
             'product_type' => 'service',
+            'help_text' => null,
             'widgets' => [
                 [
                     'widget_name' => 'related-posts-input',

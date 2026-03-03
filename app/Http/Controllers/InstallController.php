@@ -32,6 +32,7 @@ class InstallController extends Controller
         $toolSlug = $this->resolveToolSlug($request);
         $registry = config("tools.registry.{$toolSlug}");
         $supportsServerFetch = ($registry['delivery_mode'] ?? '') === 'server_fetch';
+        $helpText = $registry['help_text'] ?? null;
         return view('install.form', [
             'tools' => $tools,
             'bdBaseUrl' => $request->old('bd_base_url', session('bd_base_url', '')),
@@ -41,6 +42,7 @@ class InstallController extends Controller
             'installConfirmNeeded' => session('install_confirm_needed', false),
             'existingWidgets' => session('existing_widgets', []),
             'supportsServerFetch' => $supportsServerFetch,
+            'helpText' => $helpText,
         ]);
     }
 
