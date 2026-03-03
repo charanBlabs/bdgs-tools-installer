@@ -1,0 +1,101 @@
+/* Weather Widget - Brilliant Directories */
+.bd-weather-widget {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    max-width: 360px;
+    margin: 0 auto;
+}
+
+.bd-weather-inner {
+    background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 16px;
+    padding: 1.25rem;
+    color: #f8fafc;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.35);
+}
+
+.bd-weather-search {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.bd-weather-input {
+    flex: 1;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    background: #1e293b;
+    color: #f8fafc;
+    font-size: 0.9375rem;
+}
+
+.bd-weather-input::placeholder {
+    color: #64748b;
+}
+
+.bd-weather-input:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+.bd-weather-btn-search {
+    padding: 0.6rem 1rem;
+    background: #0ea5e9;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.bd-weather-btn-search:hover {
+    background: #0284c7;
+}
+
+.bd-weather-loading,
+.bd-weather-error {
+    padding: 0.75rem 0;
+    color: #94a3b8;
+    font-size: 0.875rem;
+}
+
+.bd-weather-error {
+    color: #f87171;
+}
+
+.bd-weather-result {
+    padding-top: 0.25rem;
+}
+
+.bd-weather-location {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 0.25rem;
+}
+
+.bd-weather-temp {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.bd-weather-desc {
+    font-size: 0.9375rem;
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+}
+
+.bd-weather-meta {
+    font-size: 0.8125rem;
+    color: #64748b;
+}
+
+.bd-weather-meta span + span::before {
+    content: " · ";
+}
