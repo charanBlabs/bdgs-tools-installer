@@ -51,7 +51,7 @@
         #install-loader .progress-fill { height: 100%; background: linear-gradient(90deg, #0ea5e9, #38bdf8); border-radius: 9999px; transition: width 0.35s ease; width: 0%; }
     </style>
 </head>
-<body class="font-sans antialiased text-slate-700 bg-gradient-to-br from-slate-50 via-slate-100 to-sky-50 min-h-screen">
+<body class="font-sans antialiased text-slate-700 bg-slate-100 min-h-screen">
     <div id="install-loader" aria-hidden="true">
         <div class="flex items-center gap-4">
             <p id="install-loader-text" class="text-white font-medium text-sm whitespace-nowrap">Installing...</p>
@@ -61,22 +61,25 @@
     </div>
     <div class="min-h-screen flex flex-col">
         {{-- Header --}}
-        <header class="border-b border-slate-200/80 bg-white/80 backdrop-blur-sm sticky top-0 z-10 animate-slide-down">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center text-white shadow-lg shadow-sky-500/25">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
+            <div class="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/25">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-slate-900">Tool Installer</h1>
-                        <p class="text-xs text-slate-500">Install tools to your Brilliant Directories site</p>
+                        <h1 class="text-xl font-bold text-slate-900">Tool Installer</h1>
+                        <p class="text-sm text-slate-500">Install tools to your Brilliant Directories site</p>
                     </div>
                 </div>
-                <a href="{{ route('admin.dashboard') }}" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Dashboard</a>
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('admin.dashboard') }}" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Dashboard</a>
+                    <a href="{{ route('admin.licenses.index') }}" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Licenses</a>
+                </div>
             </div>
         </header>
 
-        <main class="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main class="flex-1 w-full max-w-[1600px] mx-auto px-6 py-8">
             {{-- Alerts --}}
             @if(session('success'))
                 <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 animate-slide-up" role="alert">
@@ -120,12 +123,8 @@
                         <input type="hidden" name="license_token" value="{{ $licenseToken ?? '' }}">
                         <input type="hidden" name="install_domain" value="{{ old('install_domain', '') }}">
                         <input type="hidden" name="install_confirm" value="update">
-                        @if(old('plain_install'))
-                        <input type="hidden" name="plain_install" value="1">
-                        @endif
-                        @if(old('enforce_license'))
-                        <input type="hidden" name="enforce_license" value="1">
-                        @endif
+                        @if(old('plain_install'))<input type="hidden" name="plain_install" value="1">@endif
+                        @if(old('enforce_license'))<input type="hidden" name="enforce_license" value="1">@endif
                         <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-amber-600 rounded-xl hover:bg-amber-700 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">Update existing</button>
                     </form>
                     <a href="{{ route('admin.install.form') }}" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50">Cancel</a>
@@ -168,153 +167,147 @@
                 </div>
             @endif
 
-            {{-- Main Form Grid --}}
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {{-- Main Content Grid --}}
+            <div class="grid grid-cols-12 gap-6">
                 
-                {{-- Left Column: Steps 1 & 1.5 --}}
-                <div class="lg:col-span-1 space-y-6">
+                {{-- Left Sidebar: Steps 1 & 1.5 --}}
+                <div class="col-span-12 lg:col-span-4 space-y-6">
                     {{-- Step 1: Connect BD --}}
-                    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50">
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-sky-500 to-sky-600">
                             <div class="flex items-center gap-3">
-                                <span class="step-badge flex items-center justify-center w-7 h-7 rounded-full bg-sky-500 text-white text-xs font-bold">1</span>
+                                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-white text-sky-600 text-sm font-bold">1</span>
                                 <div>
-                                    <h2 class="text-sm font-bold text-slate-900">Connect BD Site</h2>
-                                    <p class="text-xs text-slate-500">Verify API token</p>
+                                    <h2 class="text-base font-bold text-white">Connect BD Site</h2>
+                                    <p class="text-xs text-sky-100">Verify your API token</p>
                                 </div>
                             </div>
                         </div>
-                        <form method="post" action="{{ route('admin.install.verify') }}" class="p-5 space-y-4">
+                        <form method="post" action="{{ route('admin.install.verify') }}" class="p-6 space-y-4">
                             @csrf
                             <div>
-                                <label for="bd_base_url" class="block text-sm font-medium text-slate-700 mb-1.5">BD Base URL</label>
-                                <input type="url" id="bd_base_url" name="bd_base_url" value="{{ $bdBaseUrl }}" placeholder="https://yoursite.directoryup.com" required autocomplete="url" class="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
+                                <label for="bd_base_url" class="block text-sm font-semibold text-slate-700 mb-2">BD Base URL</label>
+                                <input type="url" id="bd_base_url" name="bd_base_url" value="{{ $bdBaseUrl }}" placeholder="https://yoursite.directoryup.com" required autocomplete="url" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400 bg-slate-50">
                             </div>
                             <div>
-                                <label for="bd_api_key" class="block text-sm font-medium text-slate-700 mb-1.5">BD API Key</label>
-                                <input type="password" id="bd_api_key" name="bd_api_key" value="{{ $bdApiKey ?? '' }}" placeholder="Your BD API key" required autocomplete="off" class="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
+                                <label for="bd_api_key" class="block text-sm font-semibold text-slate-700 mb-2">BD API Key</label>
+                                <input type="password" id="bd_api_key" name="bd_api_key" value="{{ $bdApiKey ?? '' }}" placeholder="Your BD API key" required autocomplete="off" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400 bg-slate-50">
                             </div>
-                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-sky-500 rounded-lg hover:bg-sky-600 focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-all">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-sky-500 rounded-xl hover:bg-sky-600 focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-all shadow-md hover:shadow-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                                 Verify Token
                             </button>
                         </form>
-                    </section>
+                    </div>
 
-                    {{-- Step 1.5: Server Files (if applicable) --}}
+                    {{-- Step 1.5: Server Files --}}
                     @if(!empty($supportsServerFetch))
-                    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="px-5 py-4 border-b border-slate-100 bg-violet-50/50">
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-violet-500 to-violet-600">
                             <div class="flex items-center gap-3">
-                                <span class="step-badge flex items-center justify-center w-7 h-7 rounded-full bg-violet-500 text-white text-xs font-bold">1.5</span>
+                                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-white text-violet-600 text-sm font-bold">1.5</span>
                                 <div>
-                                    <h2 class="text-sm font-bold text-slate-900">Server Files</h2>
-                                    <p class="text-xs text-slate-500">Upload assets</p>
+                                    <h2 class="text-base font-bold text-white">Server Files</h2>
+                                    <p class="text-xs text-violet-100">Upload tool assets</p>
                                 </div>
                             </div>
                         </div>
-                        <form method="post" action="{{ route('admin.install.setup') }}" enctype="multipart/form-data" class="p-5 space-y-4">
+                        <form method="post" action="{{ route('admin.install.setup') }}" enctype="multipart/form-data" class="p-6 space-y-4">
                             @csrf
                             <input type="hidden" name="tool_slug" value="{{ $toolSlug }}">
                             <div>
-                                <label for="server_files" class="block text-sm font-medium text-slate-700 mb-1.5">Files (HTML, JS, etc.)</label>
-                                <input type="file" id="server_files" name="server_files[]" multiple accept=".html,.htm,.js,.css" class="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                                <label for="server_files" class="block text-sm font-semibold text-slate-700 mb-2">Server Files</label>
+                                <input type="file" id="server_files" name="server_files[]" multiple accept=".html,.htm,.js,.css" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 bg-slate-50">
+                                <p class="text-xs text-slate-500 mt-1.5">HTML, JS, CSS files to serve from your server</p>
                             </div>
                             <div>
-                                <label for="custom_base_url" class="block text-sm font-medium text-slate-700 mb-1.5">Custom URL <span class="text-slate-400 font-normal">(optional)</span></label>
-                                <input type="url" id="custom_base_url" name="custom_base_url" value="{{ old('custom_base_url') }}" placeholder="https://cdn.example.com/" class="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
+                                <label for="custom_base_url" class="block text-sm font-semibold text-slate-700 mb-2">Custom Base URL <span class="text-slate-400 font-normal">(optional)</span></label>
+                                <input type="url" id="custom_base_url" name="custom_base_url" value="{{ old('custom_base_url') }}" placeholder="https://cdn.example.com/" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all placeholder-slate-400 bg-slate-50">
                             </div>
-                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-violet-500 rounded-lg hover:bg-violet-600 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-violet-500 rounded-xl hover:bg-violet-600 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all shadow-md">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                                 Save Setup
                             </button>
                         </form>
-                    </section>
+                    </div>
                     @endif
                 </div>
 
-                {{-- Right Column: Step 2 --}}
-                <div class="lg:col-span-2">
-                    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full">
-                        <div class="px-5 py-4 border-b border-slate-100 bg-slate-800">
+                {{-- Right Main: Step 2 --}}
+                <div class="col-span-12 lg:col-span-8">
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full">
+                        <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-800 to-slate-900">
                             <div class="flex items-center gap-3">
-                                <span class="step-badge flex items-center justify-center w-7 h-7 rounded-full bg-white text-slate-800 text-xs font-bold">2</span>
+                                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-white text-slate-800 text-sm font-bold">2</span>
                                 <div>
-                                    <h2 class="text-sm font-bold text-white">Install Tool</h2>
-                                    <p class="text-xs text-slate-400">Select tool and run installer</p>
+                                    <h2 class="text-base font-bold text-white">Install Tool</h2>
+                                    <p class="text-xs text-slate-400">Select a tool and install to your BD site</p>
                                 </div>
                             </div>
                         </div>
-                        <form id="install-run-form" method="post" action="{{ route('admin.install.run') }}" class="p-5 space-y-5">
+                        <form id="install-run-form" method="post" action="{{ route('admin.install.run') }}" class="p-6 space-y-6">
                             @csrf
                             <input type="hidden" name="bd_base_url" value="{{ $bdBaseUrl }}">
                             <input type="hidden" name="bd_api_key" value="{{ $bdApiKey ?? '' }}">
                             
                             {{-- Tool Selection --}}
                             <div>
-                                <label for="tool_slug" class="block text-sm font-medium text-slate-700 mb-1.5">Select Tool</label>
-                                <select id="tool_slug" name="tool_slug" required class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all bg-white">
+                                <label for="tool_slug" class="block text-sm font-semibold text-slate-700 mb-2">Select Tool</label>
+                                <select id="tool_slug" name="tool_slug" required class="w-full px-4 py-3.5 text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all bg-slate-50">
                                     @foreach($tools as $slug => $config)
                                         <option value="{{ $slug }}" data-help='{{ ($config['help_text'] ?? '') }}' {{ ($toolSlug ?? '') === $slug ? 'selected' : '' }}>{{ $config['name'] ?? $slug }} ({{ $config['type'] ?? 'service' }})</option>
                                     @endforeach
                                 </select>
                             </div>
 
-                            {{-- License & Domain --}}
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {{-- License & Domain Row --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="license_token" class="block text-sm font-medium text-slate-700 mb-1.5">License Token <span class="text-slate-400 font-normal">(required)</span></label>
-                                    <input type="text" id="license_token" name="license_token" value="{{ $licenseToken ?? '' }}" placeholder="Paste your license token" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400 font-mono">
+                                    <label for="license_token" class="block text-sm font-semibold text-slate-700 mb-2">License Token <span class="text-red-500">*</span></label>
+                                    <input type="text" id="license_token" name="license_token" value="{{ $licenseToken ?? '' }}" placeholder="Paste your license token" required class="w-full px-4 py-3.5 text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400 bg-slate-50 font-mono">
                                 </div>
                                 <div>
-                                    <label for="install_domain" class="block text-sm font-medium text-slate-700 mb-1.5">Domain <span class="text-slate-400 font-normal">(optional)</span></label>
-                                    <input type="text" id="install_domain" name="install_domain" placeholder="example.com" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
+                                    <label for="install_domain" class="block text-sm font-semibold text-slate-700 mb-2">Install Domain <span class="text-slate-400 font-normal">(optional)</span></label>
+                                    <input type="text" id="install_domain" name="install_domain" placeholder="example.com" class="w-full px-4 py-3.5 text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400 bg-slate-50">
                                 </div>
                             </div>
 
                             {{-- Options --}}
-                            <div class="space-y-3">
+                            <div class="bg-slate-50 rounded-xl p-5 space-y-4">
                                 <div class="flex items-start gap-3">
-                                    <input type="checkbox" id="plain_install" name="plain_install" value="1" {{ old('plain_install') ? 'checked' : '' }} class="mt-1 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                                    <input type="checkbox" id="plain_install" name="plain_install" value="1" {{ old('plain_install') ? 'checked' : '' }} class="mt-1 h-5 w-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
                                     <label for="plain_install" class="text-sm text-slate-700">
-                                        <span class="font-medium">Install as plain code</span>
-                                        <p class="text-xs text-slate-500">No encryption. Raw PHP/CSS/JS sent to BD.</p>
+                                        <span class="font-semibold">Install as plain code</span>
+                                        <p class="text-xs text-slate-500 mt-0.5">No encryption. Raw PHP/CSS/JS sent to BD. Easier to debug.</p>
                                     </label>
                                 </div>
                                 <div class="flex items-start gap-3">
-                                    <input type="checkbox" id="enforce_license" name="enforce_license" value="1" {{ old('enforce_license') ? 'checked' : '' }} class="mt-1 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                                    <input type="checkbox" id="enforce_license" name="enforce_license" value="1" {{ old('enforce_license') ? 'checked' : '' }} class="mt-1 h-5 w-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
                                     <label for="enforce_license" class="text-sm text-slate-700">
-                                        <span class="font-medium">Enforce license</span>
-                                        <p class="text-xs text-slate-500">Widget checks license at runtime. Shows renewal message if invalid.</p>
+                                        <span class="font-semibold">Enforce license at runtime</span>
+                                        <p class="text-xs text-slate-500 mt-0.5">Widget checks license on each page load. Shows renewal message if invalid/expired.</p>
                                     </label>
                                 </div>
                             </div>
 
-                            <p class="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg">⚠️ For <strong>Enforce license</strong>: Set <code class="bg-slate-200 px-1 rounded">APP_URL</code> in your <code class="bg-slate-200 px-1 rounded">.env</code> to a <strong>public URL</strong> (not localhost).</p>
+                            <p class="text-xs text-slate-500 bg-amber-50 border border-amber-200 p-3 rounded-lg">⚠️ <strong>Note:</strong> For "Enforce license", set <code class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-800">APP_URL</code> in your <code class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-800">.env</code> to a <strong>public URL</strong> (not localhost).</p>
 
-                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 text-base font-medium text-white bg-slate-800 rounded-xl hover:bg-slate-900 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-all shadow-lg">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-3 px-6 py-4 text-base font-semibold text-white bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl hover:from-slate-900 hover:to-slate-800 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-all shadow-lg hover:shadow-xl">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                 Install Tool
                             </button>
 
-                            {{-- Help Text Box --}}
-                            <div id="tool-help-text" class="hidden p-4 rounded-xl bg-sky-50 border border-sky-200 text-sm text-slate-700">
+                            {{-- Help Text --}}
+                            <div id="tool-help-text" class="hidden p-5 rounded-xl bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200">
                             </div>
                         </form>
-                    </section>
+                    </div>
                 </div>
             </div>
-
-            <p class="mt-8 text-center text-sm text-slate-500">
-                <a href="{{ route('admin.dashboard') }}" class="text-sky-500 hover:underline font-medium">Dashboard</a>
-                <span class="mx-2">·</span>
-                <a href="{{ route('admin.licenses.index') }}" class="text-sky-500 hover:underline font-medium">Licenses</a>
-            </p>
         </main>
     </div>
     <script>
     (function () {
-        // Tool dropdown change handler - show/hide help text based on selection
         var toolSelect = document.getElementById('tool_slug');
         var helpTextContainer = document.getElementById('tool-help-text');
         if (toolSelect && helpTextContainer) {
@@ -328,7 +321,6 @@
                     helpTextContainer.classList.add('hidden');
                 }
             });
-            // Initialize on page load
             var initialOption = toolSelect.options[toolSelect.selectedIndex];
             var initialHelp = initialOption.getAttribute('data-help');
             if (!initialHelp || initialHelp.trim() === '') {
