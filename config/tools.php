@@ -55,5 +55,28 @@ return [
                 ],
             ],
         ],
+        'related-posts' => [
+            'slug' => 'related-posts',
+            'name' => 'Related Posts',
+            'type' => 'service',
+            'version' => '1.0',
+            'product_type' => 'service',
+            'widgets' => [
+                [
+                    'widget_name' => 'related-posts-input',
+                    'widget_data_key' => 'form-input.php',
+                    'widget_style_key' => 'form-input.css',
+                    'widget_javascript_key' => null,
+                    'widget_viewport' => 'admin',
+                ],
+                [
+                    'widget_name' => 'related-posts-display',
+                    'widget_data_key' => 'frontend-display.php',
+                    'widget_style_key' => 'frontend-display.css',
+                    'widget_javascript_key' => null,
+                    'widget_viewport' => 'front',
+                ],
+            ],
+        ],
     ],
 ];

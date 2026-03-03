@@ -1,0 +1,8 @@
+.scrollbox {
+  height:250px;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  overflow-x:scroll;
+}
+input[type=checkbox]{
+	margin: 4px 6px 0 !important;}
