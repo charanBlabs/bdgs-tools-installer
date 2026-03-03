@@ -243,9 +243,9 @@
                         <input type="hidden" name="bd_api_key" value="{{ $bdApiKey ?? '' }}">
                         <div>
                             <label for="tool_slug" class="block text-sm font-medium text-slate-700 mb-1.5">Tool</label>
-                            <select id="tool_slug" name="tool_slug" required class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all bg-white" onchange="var url = new URL(window.location.href); url.searchParams.set('tool', this.value); window.location.href = url.toString();">
+                            <select id="tool_slug" name="tool_slug" required class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all bg-white">
                                 @foreach($tools as $slug => $config)
-                                    <option value="{{ $slug }}" {{ ($toolSlug ?? '') === $slug ? 'selected' : '' }}>{{ $config['name'] ?? $slug }} ({{ $config['type'] ?? 'service' }})</option>
+                                    <option value="{{ $slug }}" data-help="{{ e($config['help_text'] ?? '') }}" {{ ($toolSlug ?? '') === $slug ? 'selected' : '' }}>{{ $config['name'] ?? $slug }} ({{ $config['type'] ?? 'service' }})</option>
                                 @endforeach
                             </select>
                         </div>
@@ -275,12 +275,11 @@
                             Install
                         </button>
                         @if(!empty($helpText))
-                        <div class="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-sm text-slate-700">
+                        <div id="tool-help-text" class="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-sm text-slate-700">
                             {!! $helpText !!}
                         </div>
                         @else
-                        {{-- DEBUG: Show debug info --}}
-                        <div class="mt-4 p-4 rounded-xl bg-red-100 border border-red-300 text-sm text-red-700 font-mono">
+                        <div id="tool-help-text" class="mt-4 p-4 rounded-xl bg-red-100 border border-red-300 text-sm text-red-700 font-mono" style="display:none;">
                             <strong>DEBUG:</strong><br>
                             toolSlug={{ $toolSlug }}<br>
                             @isset($debug)<br>
@@ -304,6 +303,28 @@
     </div>
     <script>
     (function () {
+        // Tool dropdown change handler - show/hide help text based on selection
+        var toolSelect = document.getElementById('tool_slug');
+        var helpTextContainer = document.getElementById('tool-help-text');
+        if (toolSelect && helpTextContainer) {
+            toolSelect.addEventListener('change', function() {
+                var selectedOption = toolSelect.options[toolSelect.selectedIndex];
+                var helpText = selectedOption.getAttribute('data-help');
+                if (helpText && helpText.trim() !== '') {
+                    helpTextContainer.innerHTML = helpText;
+                    helpTextContainer.style.display = 'block';
+                } else {
+                    helpTextContainer.style.display = 'none';
+                }
+            });
+            // Initialize on page load
+            var initialOption = toolSelect.options[toolSelect.selectedIndex];
+            var initialHelp = initialOption.getAttribute('data-help');
+            if (!initialHelp || initialHelp.trim() === '') {
+                helpTextContainer.style.display = 'none';
+            }
+        }
+        
         var form = document.getElementById('install-run-form');
         var loader = document.getElementById('install-loader');
         var progressFill = document.getElementById('install-progress-fill');
