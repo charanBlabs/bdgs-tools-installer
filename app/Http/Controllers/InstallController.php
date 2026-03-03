@@ -30,7 +30,22 @@ class InstallController extends Controller
         }
         $tools = config('tools.registry', []);
         $toolSlug = $this->resolveToolSlug($request);
+        
+        // DEBUG: Log what we're getting
+        $debug = [
+            'query_tool' => $request->query('tool'),
+            'old_tool' => $request->old('tool_slug'),
+            'resolved_toolSlug' => $toolSlug,
+            'registry_keys' => array_keys($tools),
+        ];
+        
         $registry = config("tools.registry.{$toolSlug}");
+        $debug['registry'] = $registry ? 'found' : 'null';
+        $debug['help_text'] = $registry['help_text'] ?? null;
+        
+        // Log to see what's happening
+        \Illuminate\Support\Facades\Log::debug('InstallController showForm debug', $debug);
+        
         $supportsServerFetch = ($registry['delivery_mode'] ?? '') === 'server_fetch';
         $helpText = $registry['help_text'] ?? null;
         return view('install.form', [
@@ -43,6 +58,7 @@ class InstallController extends Controller
             'existingWidgets' => session('existing_widgets', []),
             'supportsServerFetch' => $supportsServerFetch,
             'helpText' => $helpText,
+            'debug' => $debug, // Pass debug info to view
         ]);
     }
 
@@ -153,8 +169,42 @@ class InstallController extends Controller
             return redirect()->back()->withInput()->with('error', 'No tool assets available. For service tools ensure encrypted payload is stored; for direct tools ensure plugin-assets are built.');
         }
         if ($plainInstall && $enforceLicense && $licenseToken) {
+            // Build widget payloads first to get viewport mapping for each asset
+            $tempPayloads = $this->payloadBuilder->buildWidgetPayloads($toolSlug, $assets);
+            // Build viewport map: asset key => viewport
+            $widgetViewportMap = [];
+            foreach ($tempPayloads as $payload) {
+                $widgetDataKey = null;
+                $registry = config("tools.registry.{$toolSlug}");
+                if ($registry && !empty($registry['widgets'])) {
+                    foreach ($registry['widgets'] as $widget) {
+                        if ($widget['widget_name'] === $payload['widget_name']) {
+                            $widgetDataKey = $widget['widget_data_key'];
+                            break;
+                        }
+                    }
+                }
+                if ($widgetDataKey) {
+                    $widgetViewportMap[$widgetDataKey] = $payload['widget_viewport'];
+                }
+            }
+            // Wrap each PHP asset based on its widget's viewport
             $checkUrl = rtrim(config('app.url', request()->getSchemeAndHttpHost()), '/') . '/api/license/check';
-            $assets = $this->plainLicenseEnforcer->wrapPhpAssetsWithLicenseCheck($assets, $checkUrl, $licenseToken);
+            $wrappedAssets = [];
+            foreach ($assets as $key => $content) {
+                if ($this->plainLicenseEnforcer->isPhpAsset($key)) {
+                    $viewport = $widgetViewportMap[$key] ?? 'admin';
+                    $wrappedAssets[$key] = $this->plainLicenseEnforcer->wrapPhpAssetsWithLicenseCheck(
+                        [$key => $content],
+                        $checkUrl,
+                        $licenseToken,
+                        $viewport
+                    )[$key];
+                } else {
+                    $wrappedAssets[$key] = $content;
+                }
+            }
+            $assets = $wrappedAssets;
         }
         $payloads = $this->payloadBuilder->buildWidgetPayloads($toolSlug, $assets);
         if (empty($payloads)) {
@@ -271,7 +321,8 @@ class InstallController extends Controller
 
     private function resolveToolSlug(Request $request): string
     {
-        $slug = $request->old('tool_slug') ?? $request->query('tool');
+        // Priority: 1) query param (tool), 2) old input (tool_slug), 3) default
+        $slug = $request->query('tool') ?? $request->old('tool_slug');
         $registry = array_keys(config('tools.registry', []));
         return $slug && in_array($slug, $registry, true) ? $slug : ($registry[0] ?? 'related-posts');
     }

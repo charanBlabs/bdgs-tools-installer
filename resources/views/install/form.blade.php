@@ -278,6 +278,18 @@
                         <div class="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-sm text-slate-700">
                             {!! $helpText !!}
                         </div>
+                        @else
+                        {{-- DEBUG: Show debug info --}}
+                        <div class="mt-4 p-4 rounded-xl bg-red-100 border border-red-300 text-sm text-red-700 font-mono">
+                            <strong>DEBUG:</strong><br>
+                            toolSlug={{ $toolSlug }}<br>
+                            @isset($debug)<br>
+                            query_tool={{ $debug['query_tool'] ?? 'null' }}<br>
+                            old_tool={{ $debug['old_tool'] ?? 'null' }}<br>
+                            resolved={{ $debug['resolved_toolSlug'] ?? 'null' }}<br>
+                            help_text={{ $debug['help_text'] ?? 'null' }}
+                            @endisset
+                        </div>
                         @endif
                     </form>
                 </div>

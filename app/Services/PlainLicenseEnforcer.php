@@ -37,7 +37,7 @@ class PlainLicenseEnforcer
         return $out;
     }
 
-    private function isPhpAsset(string $key): bool
+    public function isPhpAsset(string $key): bool
     {
         return str_ends_with(strtolower($key), '.php');
     }
