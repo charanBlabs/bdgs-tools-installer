@@ -33,7 +33,7 @@ return [
                 [
                     'widget_name' => 'FAQ Global Renderer',
                     'widget_data_key' => 'global-renderer.php',
-                    'widget_style_key' => null,
+                    'widget_style_key' => 'global-renderer.css',
                     'widget_javascript_key' => null,
                     'widget_viewport' => 'front',
                 ],
