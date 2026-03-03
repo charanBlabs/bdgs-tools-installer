@@ -62,7 +62,7 @@
     <div class="min-h-screen flex flex-col">
         {{-- Header --}}
         <header class="border-b border-slate-200/80 bg-white/80 backdrop-blur-sm sticky top-0 z-10 animate-slide-down">
-            <div class="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center text-white shadow-lg shadow-sky-500/25">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -76,7 +76,7 @@
             </div>
         </header>
 
-        <main class="flex-1 max-w-2xl w-full mx-auto px-4 py-8 md:py-12">
+        <main class="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {{-- Alerts --}}
             @if(session('success'))
                 <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 animate-slide-up" role="alert">
@@ -168,133 +168,144 @@
                 </div>
             @endif
 
-            {{-- Step 1: Connect BD --}}
-            <section class="mb-8 animate-slide-up" style="animation-delay: 0.05s;">
-                <div class="flex items-center gap-3 mb-4">
-                    <span class="step-badge flex items-center justify-center w-8 h-8 rounded-full bg-sky-500 text-white text-sm font-bold shadow-lg shadow-sky-500/30">1</span>
-                    <div>
-                        <h2 class="text-base font-bold text-slate-900">Connect your BD site</h2>
-                        <p class="text-sm text-slate-500">Verify your Brilliant Directories API token</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm shadow-slate-200/50 overflow-hidden transition-shadow hover:shadow-md">
-                    <form method="post" action="{{ route('admin.install.verify') }}" class="p-5 md:p-6 space-y-4">
-                        @csrf
-                        <div>
-                            <label for="bd_base_url" class="block text-sm font-medium text-slate-700 mb-1.5">BD Base URL</label>
-                            <input type="url" id="bd_base_url" name="bd_base_url" value="{{ $bdBaseUrl }}" placeholder="https://yoursite.directoryup.com" required autocomplete="url" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
+            {{-- Main Form Grid --}}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {{-- Left Column: Steps 1 & 1.5 --}}
+                <div class="lg:col-span-1 space-y-6">
+                    {{-- Step 1: Connect BD --}}
+                    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50">
+                            <div class="flex items-center gap-3">
+                                <span class="step-badge flex items-center justify-center w-7 h-7 rounded-full bg-sky-500 text-white text-xs font-bold">1</span>
+                                <div>
+                                    <h2 class="text-sm font-bold text-slate-900">Connect BD Site</h2>
+                                    <p class="text-xs text-slate-500">Verify API token</p>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label for="bd_api_key" class="block text-sm font-medium text-slate-700 mb-1.5">BD API Key</label>
-                            <input type="password" id="bd_api_key" name="bd_api_key" value="{{ $bdApiKey ?? '' }}" placeholder="Your BD API key" required autocomplete="off" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
-                        </div>
-                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium text-white bg-sky-500 rounded-xl hover:bg-sky-600 focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow hover:shadow-sky-500/25">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                            Verify token
-                        </button>
-                    </form>
-                </div>
-            </section>
+                        <form method="post" action="{{ route('admin.install.verify') }}" class="p-5 space-y-4">
+                            @csrf
+                            <div>
+                                <label for="bd_base_url" class="block text-sm font-medium text-slate-700 mb-1.5">BD Base URL</label>
+                                <input type="url" id="bd_base_url" name="bd_base_url" value="{{ $bdBaseUrl }}" placeholder="https://yoursite.directoryup.com" required autocomplete="url" class="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
+                            </div>
+                            <div>
+                                <label for="bd_api_key" class="block text-sm font-medium text-slate-700 mb-1.5">BD API Key</label>
+                                <input type="password" id="bd_api_key" name="bd_api_key" value="{{ $bdApiKey ?? '' }}" placeholder="Your BD API key" required autocomplete="off" class="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
+                            </div>
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-sky-500 rounded-lg hover:bg-sky-600 focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                Verify Token
+                            </button>
+                        </form>
+                    </section>
 
-            @if(!empty($supportsServerFetch))
-            {{-- Setup tool: upload server files + optional custom URL (for server_fetch tools) --}}
-            <section class="mb-8 animate-slide-up" style="animation-delay: 0.1s;">
-                <div class="flex items-center gap-3 mb-4">
-                    <span class="step-badge flex items-center justify-center w-8 h-8 rounded-full bg-violet-500 text-white text-sm font-bold shadow-lg shadow-violet-500/30">1.5</span>
-                    <div>
-                        <h2 class="text-base font-bold text-slate-900">Setup tool (server files)</h2>
-                        <p class="text-sm text-slate-500">Upload HTML/JS to be served from your server; widget will fetch them at runtime. Optional: set a custom base URL (e.g. CDN).</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm shadow-slate-200/50 overflow-hidden transition-shadow hover:shadow-md">
-                    <form method="post" action="{{ route('admin.install.setup') }}" enctype="multipart/form-data" class="p-5 md:p-6 space-y-4">
-                        @csrf
-                        <input type="hidden" name="tool_slug" value="{{ $toolSlug }}">
-                        <div>
-                            <label for="server_files" class="block text-sm font-medium text-slate-700 mb-1.5">Server files (HTML, JS, etc.)</label>
-                            <input type="file" id="server_files" name="server_files[]" multiple accept=".html,.htm,.js,.css" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
-                            <p class="text-xs text-slate-500 mt-1">These will be stored on this server and fetched by the widget using your license token.</p>
+                    {{-- Step 1.5: Server Files (if applicable) --}}
+                    @if(!empty($supportsServerFetch))
+                    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 border-b border-slate-100 bg-violet-50/50">
+                            <div class="flex items-center gap-3">
+                                <span class="step-badge flex items-center justify-center w-7 h-7 rounded-full bg-violet-500 text-white text-xs font-bold">1.5</span>
+                                <div>
+                                    <h2 class="text-sm font-bold text-slate-900">Server Files</h2>
+                                    <p class="text-xs text-slate-500">Upload assets</p>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label for="custom_base_url" class="block text-sm font-medium text-slate-700 mb-1.5">Custom base URL <span class="text-slate-400 font-normal">(optional)</span></label>
-                            <input type="url" id="custom_base_url" name="custom_base_url" value="{{ old('custom_base_url') }}" placeholder="https://cdn.example.com/tool-assets/{{ $toolSlug }}" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
-                        </div>
-                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium text-white bg-violet-500 rounded-xl hover:bg-violet-600 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all shadow-sm">
-                            Save setup
-                        </button>
-                    </form>
+                        <form method="post" action="{{ route('admin.install.setup') }}" enctype="multipart/form-data" class="p-5 space-y-4">
+                            @csrf
+                            <input type="hidden" name="tool_slug" value="{{ $toolSlug }}">
+                            <div>
+                                <label for="server_files" class="block text-sm font-medium text-slate-700 mb-1.5">Files (HTML, JS, etc.)</label>
+                                <input type="file" id="server_files" name="server_files[]" multiple accept=".html,.htm,.js,.css" class="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                            </div>
+                            <div>
+                                <label for="custom_base_url" class="block text-sm font-medium text-slate-700 mb-1.5">Custom URL <span class="text-slate-400 font-normal">(optional)</span></label>
+                                <input type="url" id="custom_base_url" name="custom_base_url" value="{{ old('custom_base_url') }}" placeholder="https://cdn.example.com/" class="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
+                            </div>
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-violet-500 rounded-lg hover:bg-violet-600 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                Save Setup
+                            </button>
+                        </form>
+                    </section>
+                    @endif
                 </div>
-            </section>
-            @endif
 
-            {{-- Step 2: Choose tool & install --}}
-            <section class="animate-slide-up" style="animation-delay: 0.15s;">
-                <div class="flex items-center gap-3 mb-4">
-                    <span class="step-badge flex items-center justify-center w-8 h-8 rounded-full bg-slate-700 text-white text-sm font-bold shadow-lg shadow-slate-700/30">2</span>
-                    <div>
-                        <h2 class="text-base font-bold text-slate-900">Choose tool &amp; install</h2>
-                        <p class="text-sm text-slate-500">Select a tool and run the installer</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm shadow-slate-200/50 overflow-hidden transition-shadow hover:shadow-md">
-                    <form id="install-run-form" method="post" action="{{ route('admin.install.run') }}" class="p-5 md:p-6 space-y-4">
-                        @csrf
-                        <input type="hidden" name="bd_base_url" value="{{ $bdBaseUrl }}">
-                        <input type="hidden" name="bd_api_key" value="{{ $bdApiKey ?? '' }}">
-                        <div>
-                            <label for="tool_slug" class="block text-sm font-medium text-slate-700 mb-1.5">Tool</label>
-                            <select id="tool_slug" name="tool_slug" required class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all bg-white">
-                                @foreach($tools as $slug => $config)
-                                    <option value="{{ $slug }}" data-help='{{ ($config['help_text'] ?? '') }}' {{ ($toolSlug ?? '') === $slug ? 'selected' : '' }}>{{ $config['name'] ?? $slug }} ({{ $config['type'] ?? 'service' }})</option>
-                                @endforeach
-                            </select>
+                {{-- Right Column: Step 2 --}}
+                <div class="lg:col-span-2">
+                    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full">
+                        <div class="px-5 py-4 border-b border-slate-100 bg-slate-800">
+                            <div class="flex items-center gap-3">
+                                <span class="step-badge flex items-center justify-center w-7 h-7 rounded-full bg-white text-slate-800 text-xs font-bold">2</span>
+                                <div>
+                                    <h2 class="text-sm font-bold text-white">Install Tool</h2>
+                                    <p class="text-xs text-slate-400">Select tool and run installer</p>
+                                </div>
+                            </div>
                         </div>
-                        <div id="license_group">
-                            <label for="license_token" class="block text-sm font-medium text-slate-700 mb-1.5">License token <span class="text-slate-400 font-normal">(required for service-based tools)</span></label>
-                            <input type="text" id="license_token" name="license_token" value="{{ $licenseToken ?? '' }}" placeholder="Paste your license token" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400 font-mono">
-                        </div>
-                        <div>
-                            <label for="install_domain" class="block text-sm font-medium text-slate-700 mb-1.5">Install domain <span class="text-slate-400 font-normal">(optional, for domain-locked licenses)</span></label>
-                            <input type="text" id="install_domain" name="install_domain" placeholder="example.com" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" id="plain_install" name="plain_install" value="1" {{ old('plain_install') ? 'checked' : '' }} class="mt-1 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                            <label for="plain_install" class="text-sm text-slate-700">
-                                <span class="font-medium">Install as plain code</span> — no encryption. Raw PHP/CSS/JS sent to BD.
-                            </label>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" id="enforce_license" name="enforce_license" value="1" {{ old('enforce_license') ? 'checked' : '' }} class="mt-1 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                            <label for="enforce_license" class="text-sm text-slate-700">
-                                <span class="font-medium">Enforce license</span> — only when plain code is used. Widget will check license at runtime; if invalid or expired, show a renewal message instead of the tool.
-                            </label>
-                        </div>
-                        <p class="text-xs text-slate-500 -mt-1">If you use Enforce license: set <code class="bg-slate-100 px-1 rounded">APP_URL</code> in your installer <code class="bg-slate-100 px-1 rounded">.env</code> to a <strong>public URL</strong> (e.g. <code class="bg-slate-100 px-1 rounded">https://your-installer.example.com</code>). localhost will not work — the installed site cannot reach it.</p>
-                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium text-white bg-slate-800 rounded-xl hover:bg-slate-900 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            Install
-                        </button>
-                        @if(!empty($helpText))
-                        <div id="tool-help-text" class="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-sm text-slate-700">
-                            {!! $helpText !!}
-                        </div>
-                        @else
-                        <div id="tool-help-text" class="mt-4 p-4 rounded-xl bg-red-100 border border-red-300 text-sm text-red-700 font-mono" style="display:none;">
-                            <strong>DEBUG:</strong><br>
-                            toolSlug={{ $toolSlug }}<br>
-                            @isset($debug)<br>
-                            query_tool={{ $debug['query_tool'] ?? 'null' }}<br>
-                            old_tool={{ $debug['old_tool'] ?? 'null' }}<br>
-                            resolved={{ $debug['resolved_toolSlug'] ?? 'null' }}<br>
-                            help_text={{ $debug['help_text'] ?? 'null' }}
-                            @endisset
-                        </div>
-                        @endif
-                    </form>
-                </div>
-            </section>
+                        <form id="install-run-form" method="post" action="{{ route('admin.install.run') }}" class="p-5 space-y-5">
+                            @csrf
+                            <input type="hidden" name="bd_base_url" value="{{ $bdBaseUrl }}">
+                            <input type="hidden" name="bd_api_key" value="{{ $bdApiKey ?? '' }}">
+                            
+                            {{-- Tool Selection --}}
+                            <div>
+                                <label for="tool_slug" class="block text-sm font-medium text-slate-700 mb-1.5">Select Tool</label>
+                                <select id="tool_slug" name="tool_slug" required class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all bg-white">
+                                    @foreach($tools as $slug => $config)
+                                        <option value="{{ $slug }}" data-help='{{ ($config['help_text'] ?? '') }}' {{ ($toolSlug ?? '') === $slug ? 'selected' : '' }}>{{ $config['name'] ?? $slug }} ({{ $config['type'] ?? 'service' }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-            <p class="mt-10 text-center text-sm text-slate-500">
+                            {{-- License & Domain --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="license_token" class="block text-sm font-medium text-slate-700 mb-1.5">License Token <span class="text-slate-400 font-normal">(required)</span></label>
+                                    <input type="text" id="license_token" name="license_token" value="{{ $licenseToken ?? '' }}" placeholder="Paste your license token" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400 font-mono">
+                                </div>
+                                <div>
+                                    <label for="install_domain" class="block text-sm font-medium text-slate-700 mb-1.5">Domain <span class="text-slate-400 font-normal">(optional)</span></label>
+                                    <input type="text" id="install_domain" name="install_domain" placeholder="example.com" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all placeholder-slate-400">
+                                </div>
+                            </div>
+
+                            {{-- Options --}}
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <input type="checkbox" id="plain_install" name="plain_install" value="1" {{ old('plain_install') ? 'checked' : '' }} class="mt-1 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                                    <label for="plain_install" class="text-sm text-slate-700">
+                                        <span class="font-medium">Install as plain code</span>
+                                        <p class="text-xs text-slate-500">No encryption. Raw PHP/CSS/JS sent to BD.</p>
+                                    </label>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <input type="checkbox" id="enforce_license" name="enforce_license" value="1" {{ old('enforce_license') ? 'checked' : '' }} class="mt-1 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                                    <label for="enforce_license" class="text-sm text-slate-700">
+                                        <span class="font-medium">Enforce license</span>
+                                        <p class="text-xs text-slate-500">Widget checks license at runtime. Shows renewal message if invalid.</p>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg">⚠️ For <strong>Enforce license</strong>: Set <code class="bg-slate-200 px-1 rounded">APP_URL</code> in your <code class="bg-slate-200 px-1 rounded">.env</code> to a <strong>public URL</strong> (not localhost).</p>
+
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 text-base font-medium text-white bg-slate-800 rounded-xl hover:bg-slate-900 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-all shadow-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                Install Tool
+                            </button>
+
+                            {{-- Help Text Box --}}
+                            <div id="tool-help-text" class="hidden p-4 rounded-xl bg-sky-50 border border-sky-200 text-sm text-slate-700">
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+
+            <p class="mt-8 text-center text-sm text-slate-500">
                 <a href="{{ route('admin.dashboard') }}" class="text-sky-500 hover:underline font-medium">Dashboard</a>
                 <span class="mx-2">·</span>
                 <a href="{{ route('admin.licenses.index') }}" class="text-sky-500 hover:underline font-medium">Licenses</a>
@@ -312,16 +323,16 @@
                 var helpText = selectedOption.getAttribute('data-help');
                 if (helpText && helpText.trim() !== '') {
                     helpTextContainer.innerHTML = helpText;
-                    helpTextContainer.style.display = 'block';
+                    helpTextContainer.classList.remove('hidden');
                 } else {
-                    helpTextContainer.style.display = 'none';
+                    helpTextContainer.classList.add('hidden');
                 }
             });
             // Initialize on page load
             var initialOption = toolSelect.options[toolSelect.selectedIndex];
             var initialHelp = initialOption.getAttribute('data-help');
             if (!initialHelp || initialHelp.trim() === '') {
-                helpTextContainer.style.display = 'none';
+                helpTextContainer.classList.add('hidden');
             }
         }
         
@@ -331,6 +342,7 @@
         var loaderPct = document.getElementById('install-loader-pct');
         var loaderText = document.getElementById('install-loader-text');
         if (!form || !loader) return;
+
         form.addEventListener('submit', function () {
             loader.classList.add('show');
             loader.setAttribute('aria-hidden', 'false');
@@ -339,12 +351,12 @@
             loaderText.textContent = 'Installing...';
             var pct = 0;
             var intervalId = setInterval(function () {
-                if (pct >= 95) return;
-                pct += Math.random() * 6 + 3;
-                if (pct > 95) pct = 95;
+                pct += 5;
+                if (pct > 90) { clearInterval(intervalId); return; }
                 progressFill.style.width = pct + '%';
-                loaderPct.textContent = Math.round(pct) + '%';
-            }, 350);
+                loaderPct.textContent = pct + '%';
+            }, 150);
+            window.onbeforeunload = function() { clearInterval(intervalId); };
         });
     })();
     </script>
