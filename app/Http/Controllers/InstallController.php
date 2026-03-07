@@ -25,6 +25,16 @@ class InstallController extends Controller
 
     public function showForm(Request $request): View
     {
+        // Check for installation success FIRST before any clearing
+        $installSuccess = session('install_success', false);
+        $installResults = session('install_results', []);
+        
+        // If fresh=1 is passed, clear all session data to start fresh
+        // But don't clear if we just had a successful installation
+        if ($request->query('fresh') == '1' && !$installSuccess) {
+            session()->forget(['bd_base_url', 'bd_api_key', 'bd_connected', 'install_existing_widgets', 'install_tool_slug', 'install_confirm_needed', 'existing_widgets']);
+        }
+        
         if (!session('install_confirm_needed', false)) {
             session()->forget(['install_existing_widgets', 'install_tool_slug']);
         }
@@ -48,17 +58,25 @@ class InstallController extends Controller
         
         $supportsServerFetch = ($registry['delivery_mode'] ?? '') === 'server_fetch';
         $helpText = $registry['help_text'] ?? null;
+        
+        // Clear the session data after reading (so it shows only once on redirect)
+        if ($installSuccess) {
+            session()->forget(['install_success', 'install_results']);
+        }
+        
         return view('install.form', [
             'tools' => $tools,
             'bdBaseUrl' => $request->old('bd_base_url', session('bd_base_url', '')),
             'bdApiKey' => $request->old('bd_api_key', session('bd_api_key', '')),
+            'bdConnected' => session('bd_connected', false),
             'licenseToken' => $request->old('license_token', ''),
             'toolSlug' => $toolSlug,
             'installConfirmNeeded' => session('install_confirm_needed', false),
             'existingWidgets' => session('existing_widgets', []),
             'supportsServerFetch' => $supportsServerFetch,
             'helpText' => $helpText,
-            'debug' => $debug, // Pass debug info to view
+            'installSuccess' => $installSuccess,
+            'installResults' => $installResults,
         ]);
     }
 
@@ -110,12 +128,13 @@ class InstallController extends Controller
         ]);
         $baseUrl = rtrim($request->input('bd_base_url'), '/');
         $apiKey = $request->input('bd_api_key');
-        session(['bd_base_url' => $baseUrl, 'bd_api_key' => $apiKey]);
+        session(['bd_base_url' => $baseUrl, 'bd_api_key' => $apiKey, 'bd_connected' => true]);
         $bd = new BDApiService($baseUrl, $apiKey);
         $result = $bd->verifyToken();
         if ($result['success']) {
-            return redirect()->route('admin.install.form')->with('success', 'BD API token is valid.');
+            return redirect()->route('admin.install.form')->with('success', 'BD API token is valid.')->withInput();
         }
+        session(['bd_connected' => false]);
         return redirect()->back()
             ->withInput()
             ->with('error', 'Token verification failed: ' . ($result['body']['message'] ?? 'HTTP ' . $result['status']));
@@ -127,6 +146,7 @@ class InstallController extends Controller
             'bd_base_url' => 'required|url',
             'bd_api_key' => 'required|string',
             'tool_slug' => 'required|string|in:' . implode(',', array_keys(config('tools.registry', []))),
+            'install_domain' => 'nullable|string|max:255',
         ]);
         $toolSlug = $request->input('tool_slug');
         $registry = config("tools.registry.{$toolSlug}");
@@ -138,6 +158,15 @@ class InstallController extends Controller
         $enforceLicense = $request->boolean('enforce_license');
         $license = null;
         $licenseToken = $request->input('license_token');
+
+        // For service tools with license, install_domain is required to ensure domain-specific licensing works
+        if ($isService && !empty($licenseToken)) {
+            $installDomain = $request->input('install_domain');
+            if (empty($installDomain)) {
+                return redirect()->back()->withInput()->with('error', 'Install Domain is required for licensed tools to ensure the license is bound to the correct website.');
+            }
+        }
+
         if ($isService && !$plainInstall) {
             $request->validate(['license_token' => 'required|string']);
             $validation = $this->licenseService->validate($licenseToken, $request->input('install_domain'));

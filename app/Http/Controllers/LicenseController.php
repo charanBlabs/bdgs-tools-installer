@@ -63,6 +63,7 @@ class LicenseController extends Controller
     {
         $request->validate([
             'tool_slug' => 'required|string|in:' . implode(',', array_keys(config('tools.registry', []))),
+            'license_type' => 'required|string|in:subscription,lifetime',
             'valid_from' => 'nullable|date',
             'valid_until' => 'nullable|date',
             'allowed_domain' => 'nullable|string|max:255',
@@ -72,6 +73,10 @@ class LicenseController extends Controller
         if ($request->filled('valid_from') && $request->filled('valid_until')) {
             $request->validate(['valid_until' => 'after_or_equal:valid_from']);
         }
+        // For lifetime licenses, valid_until is not required
+        if ($request->input('license_type') === 'subscription' && !$request->filled('valid_until')) {
+            $request->validate(['valid_until' => 'required'], ['valid_until.required' => 'Valid until is required for subscription licenses.']);
+        }
         // Parse datetimes in user's timezone so "5 mins from now" in the form is stored correctly (app is UTC)
         $tz = $request->input('timezone') && in_array($request->input('timezone'), timezone_identifiers_list(), true)
             ? $request->input('timezone')
@@ -80,12 +85,15 @@ class LicenseController extends Controller
         $license = new License();
         $license->token = $this->licenseService->generateToken();
         $license->tool_slug = $request->input('tool_slug');
+        $license->license_type = $request->input('license_type');
         $license->valid_from = $request->input('valid_from')
             ? \Carbon\Carbon::parse($request->input('valid_from'), $tz)->utc()
             : null;
-        $license->valid_until = $request->input('valid_until')
-            ? \Carbon\Carbon::parse($request->input('valid_until'), $tz)->utc()
-            : null;
+        $license->valid_until = $request->input('license_type') === 'lifetime'
+            ? null
+            : ($request->input('valid_until')
+                ? \Carbon\Carbon::parse($request->input('valid_until'), $tz)->utc()
+                : null);
         $license->allowed_domain = $request->input('allowed_domain') ?: null;
         $license->subscription_id = $request->input('subscription_id') ?: null;
         $license->revoked = false;
@@ -102,6 +110,7 @@ class LicenseController extends Controller
     public function update(Request $request, License $license)
     {
         $request->validate([
+            'license_type' => 'required|string|in:subscription,lifetime',
             'valid_from' => 'nullable|date',
             'valid_until' => 'nullable|date',
             'allowed_domain' => 'nullable|string|max:255',
@@ -111,16 +120,23 @@ class LicenseController extends Controller
         if ($request->filled('valid_from') && $request->filled('valid_until')) {
             $request->validate(['valid_until' => 'after_or_equal:valid_from']);
         }
+        // For lifetime licenses, valid_until is not required
+        if ($request->input('license_type') === 'subscription' && !$request->filled('valid_until') && !$license->isLifetime()) {
+            $request->validate(['valid_until' => 'required'], ['valid_until.required' => 'Valid until is required for subscription licenses.']);
+        }
         $tz = $request->input('timezone') && in_array($request->input('timezone'), timezone_identifiers_list(), true)
             ? $request->input('timezone')
             : config('app.timezone');
         $request->session()->put('license_form_timezone', $tz);
+        $license->license_type = $request->input('license_type');
         $license->valid_from = $request->input('valid_from')
             ? \Carbon\Carbon::parse($request->input('valid_from'), $tz)->utc()
             : null;
-        $license->valid_until = $request->input('valid_until')
-            ? \Carbon\Carbon::parse($request->input('valid_until'), $tz)->utc()
-            : null;
+        $license->valid_until = $request->input('license_type') === 'lifetime'
+            ? null
+            : ($request->input('valid_until')
+                ? \Carbon\Carbon::parse($request->input('valid_until'), $tz)->utc()
+                : null);
         $license->allowed_domain = $request->input('allowed_domain') ?: null;
         $license->subscription_id = $request->input('subscription_id') ?: null;
         if ($request->has('revoked')) {

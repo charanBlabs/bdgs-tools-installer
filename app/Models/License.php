@@ -15,6 +15,7 @@ class License extends Model
         'valid_until',
         'allowed_domain',
         'tool_slug',
+        'license_type',
         'revoked',
     ];
 
@@ -23,6 +24,15 @@ class License extends Model
         'valid_until' => 'datetime',
         'revoked' => 'boolean',
     ];
+
+    /**
+     * Check if this is a lifetime license (no expiration).
+     * Returns false for null/unset license_type for backward compatibility.
+     */
+    public function isLifetime(): bool
+    {
+        return $this->license_type === 'lifetime';
+    }
 
     /** Interpret stored valid_from as UTC (DB stores UTC from controller). */
     public function getValidFromUtc(): ?Carbon
@@ -45,12 +55,16 @@ class License extends Model
 
     /**
      * Status for display in admin (ignores domain).
-     * Returns: 'revoked' | 'expired' | 'not_yet_valid' | 'active'
+     * Returns: 'revoked' | 'expired' | 'not_yet_valid' | 'active' | 'lifetime'
      */
     public function statusLabel(): string
     {
         if ($this->revoked) {
             return 'revoked';
+        }
+        // Lifetime licenses don't expire
+        if ($this->isLifetime()) {
+            return 'lifetime';
         }
         $fromUtc = $this->getValidFromUtc();
         if ($fromUtc && $fromUtc->isFuture()) {
@@ -71,10 +85,18 @@ class License extends Model
         if ($this->revoked) {
             return 'License has been revoked.';
         }
-        $fromUtc = $this->getValidFromUtc();
-            if ($fromUtc && $fromUtc->isFuture()) {
-            return 'License is not yet valid (valid from ' . $fromUtc->format('M j, Y g:i:s A') . ' UTC). Leave “Valid from” empty or set to now for immediate use.';
+        // Lifetime licenses are always valid (if not revoked), only check domain
+        if ($this->isLifetime()) {
+            if ($this->allowed_domain !== null && $domain !== null && $this->allowed_domain !== $domain) {
+                return 'License is not valid for this domain (allowed: ' . $this->allowed_domain . ').';
             }
+            return null;
+        }
+        // Subscription licenses: check expiration dates
+        $fromUtc = $this->getValidFromUtc();
+        if ($fromUtc && $fromUtc->isFuture()) {
+            return 'License is not yet valid (valid from ' . $fromUtc->format('M j, Y g:i:s A') . ' UTC). Leave "Valid from" empty or set to now for immediate use.';
+        }
         $untilUtc = $this->getValidUntilUtc();
         if ($untilUtc && $untilUtc->isPast()) {
             return 'License has expired (expired ' . $untilUtc->format('M j, Y g:i:s A') . ' UTC).';

@@ -87,6 +87,7 @@
                     </th>
                     <th class="text-left py-3.5 px-4 font-semibold text-slate-600 uppercase tracking-wider">Token</th>
                     <th class="text-left py-3.5 px-4 font-semibold text-slate-600 uppercase tracking-wider">Tool</th>
+                    <th class="text-left py-3.5 px-4 font-semibold text-slate-600 uppercase tracking-wider">Type</th>
                     <th class="text-left py-3.5 px-4 font-semibold text-slate-600 uppercase tracking-wider">Valid from</th>
                     <th class="text-left py-3.5 px-4 font-semibold text-slate-600 uppercase tracking-wider">Valid until</th>
                     <th class="text-left py-3.5 px-4 font-semibold text-slate-600 uppercase tracking-wider">Domain</th>
@@ -110,8 +111,23 @@
                             </span>
                         </td>
                         <td class="py-3 px-4 text-slate-700">{{ $license->tool_slug }}</td>
+                        <td class="py-3 px-4">
+                            @if($license->license_type === 'lifetime')
+                                <span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
+                                    Lifetime
+                                </span>
+                            @else
+                                <span class="text-slate-600">Subscription</span>
+                            @endif
+                        </td>
                         <td class="py-3 px-4 text-slate-600">{{ $license->getValidFromUtc() ? $license->getValidFromUtc()->format('Y-m-d H:i:s') . ' UTC' : '–' }}</td>
-                        <td class="py-3 px-4 text-slate-600">{{ $license->getValidUntilUtc() ? $license->getValidUntilUtc()->format('Y-m-d H:i:s') . ' UTC' : '–' }}</td>
+                        <td class="py-3 px-4 text-slate-600">
+                            @if($license->isLifetime())
+                                <span class="text-emerald-600 font-medium">Never</span>
+                            @else
+                                {{ $license->getValidUntilUtc() ? $license->getValidUntilUtc()->format('Y-m-d H:i:s') . ' UTC' : '–' }}
+                            @endif
+                        </td>
                         <td class="py-3 px-4 text-slate-600">{{ $license->allowed_domain ?? '–' }}</td>
                         <td class="py-3 px-4">
                             @if($license->statusLabel() === 'revoked')
@@ -123,6 +139,10 @@
                             @elseif($license->statusLabel() === 'not_yet_valid')
                                 <span class="inline-flex items-center gap-1.5 text-slate-500 font-medium">
                                     <span class="w-2 h-2 rounded-full bg-slate-400"></span> Not yet valid
+                                </span>
+                            @elseif($license->statusLabel() === 'lifetime')
+                                <span class="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Active (Lifetime)
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1.5 text-emerald-600 font-medium">

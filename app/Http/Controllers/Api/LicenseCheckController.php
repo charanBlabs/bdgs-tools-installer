@@ -41,9 +41,15 @@ class LicenseCheckController extends Controller
             'valid' => $result['valid'],
             'message' => $result['message'],
         ];
-        $untilUtc = $license ? $license->getValidUntilUtc() : null;
-        if ($untilUtc) {
-            $payload['expires_at'] = $untilUtc->format('Y-m-d H:i:s');
+        // For lifetime licenses, expires_at is null
+        // For subscription licenses, return the expiration date if set
+        if ($license && !$license->isLifetime()) {
+            $untilUtc = $license->getValidUntilUtc();
+            if ($untilUtc) {
+                $payload['expires_at'] = $untilUtc->format('Y-m-d H:i:s');
+            } else {
+                $payload['expires_at'] = null;
+            }
         } else {
             $payload['expires_at'] = null;
         }

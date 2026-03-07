@@ -31,12 +31,30 @@
                     <dd class="mt-1 text-slate-800">{{ $license->tool_slug }}</dd>
                 </div>
                 <div>
+                    <dt class="font-medium text-slate-500 uppercase tracking-wider text-xs">License Type</dt>
+                    <dd class="mt-1 text-slate-800">
+                        @if($license->license_type === 'lifetime')
+                            <span class="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Lifetime
+                            </span>
+                        @else
+                            <span class="text-slate-800">Subscription</span>
+                        @endif
+                    </dd>
+                </div>
+                <div>
                     <dt class="font-medium text-slate-500 uppercase tracking-wider text-xs">Valid from</dt>
                     <dd class="mt-1 text-slate-800">{{ $license->getValidFromUtc() ? $license->getValidFromUtc()->format('M j, Y g:i:s A') . ' UTC' : '–' }}</dd>
                 </div>
                 <div>
                     <dt class="font-medium text-slate-500 uppercase tracking-wider text-xs">Valid until</dt>
-                    <dd class="mt-1 text-slate-800">{{ $license->valid_until ? $license->valid_until->format('M j, Y g:i:s A') . ' UTC' : '–' }}</dd>
+                    <dd class="mt-1 text-slate-800">
+                        @if($license->isLifetime())
+                            <span class="text-emerald-600 font-medium">Never (Lifetime)</span>
+                        @else
+                            {{ $license->valid_until ? $license->valid_until->format('M j, Y g:i:s A') . ' UTC' : '–' }}
+                        @endif
+                    </dd>
                 </div>
                 <div>
                     <dt class="font-medium text-slate-500 uppercase tracking-wider text-xs">Domain</dt>
@@ -54,6 +72,10 @@
                         @elseif($license->statusLabel() === 'not_yet_valid')
                             <span class="inline-flex items-center gap-1.5 text-slate-500 font-medium">
                                 <span class="w-2 h-2 rounded-full bg-slate-400"></span> Not yet valid
+                            </span>
+                        @elseif($license->statusLabel() === 'lifetime')
+                            <span class="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Active (Lifetime)
                             </span>
                         @else
                             <span class="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
@@ -97,6 +119,14 @@
                     </select>
                     <p class="text-xs text-slate-500 mt-1">Times you enter are in this timezone; stored as UTC. Server validates in UTC.</p>
                 </div>
+            <div>
+                <label for="license_type" class="block text-sm font-medium text-slate-700 mb-1.5">License Type</label>
+                <select id="license_type" name="license_type" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                    <option value="subscription" {{ old('license_type', $license->license_type) === 'subscription' ? 'selected' : '' }}>Subscription (time-limited)</option>
+                    <option value="lifetime" {{ old('license_type', $license->license_type) === 'lifetime' ? 'selected' : '' }}>Lifetime (no expiration)</option>
+                </select>
+                <p class="text-xs text-slate-500 mt-1">Select <strong>Subscription</strong> for time-limited licenses. Select <strong>Lifetime</strong> for one-time payment licenses that never expire.</p>
+            </div>
             <input type="hidden" id="data-valid-from" value="{{ $license->getValidFromUtc() ? $license->getValidFromUtc()->toIso8601String() : '' }}">
             <input type="hidden" id="data-valid-until" value="{{ $license->getValidUntilUtc() ? $license->getValidUntilUtc()->toIso8601String() : '' }}">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -109,12 +139,13 @@
                     </div>
                     <p class="text-xs text-slate-500 mt-1">Leave empty or click Clear for license to be valid immediately.</p>
                 </div>
-                <div>
-                    <label for="valid_until" class="block text-sm font-medium text-slate-700 mb-1.5">Valid until (optional)</label>
+                <div id="valid_until_container">
+                    <label for="valid_until" class="block text-sm font-medium text-slate-700 mb-1.5">Valid until</label>
                     <div class="flex gap-2">
                         <input type="datetime-local" id="valid_until" name="valid_until" step="1" class="flex-1 min-w-0 px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
                         <button type="button" id="valid_until_5min" class="px-3 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 border border-slate-300 rounded-lg hover:bg-slate-200 whitespace-nowrap">+5 min</button>
                     </div>
+                    <p class="text-xs text-slate-500 mt-1">Required for subscription licenses. Hidden for lifetime licenses.</p>
                 </div>
             </div>
             <div>
@@ -177,6 +208,28 @@
         d.setMinutes(d.getMinutes() + 5);
         if (validUntil) validUntil.value = toLocalISO(d, true);
     });
+
+    // License type dropdown - show/hide valid_until field
+    var licenseTypeSelect = document.getElementById('license_type');
+    var validUntilContainer = document.getElementById('valid_until_container');
+
+    function updateValidUntilVisibility() {
+        if (licenseTypeSelect && validUntilContainer) {
+            if (licenseTypeSelect.value === 'lifetime') {
+                validUntilContainer.style.display = 'none';
+                validUntil.value = ''; // Clear the value when switching to lifetime
+            } else {
+                validUntilContainer.style.display = 'block';
+            }
+        }
+    }
+
+    if (licenseTypeSelect) {
+        licenseTypeSelect.addEventListener('change', updateValidUntilVisibility);
+        // Initialize on page load
+        updateValidUntilVisibility();
+    }
+
     document.querySelectorAll('.license-copy-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.preventDefault();

@@ -88,6 +88,7 @@ class InstallApiController extends Controller
             'bd_base_url' => 'required|url',
             'bd_api_key' => 'required|string',
             'tool_slug' => 'required|string|in:' . implode(',', array_keys(config('tools.registry', []))),
+            'install_domain' => 'nullable|string|max:255',
         ]);
         $toolSlug = $request->input('tool_slug');
         $registry = config("tools.registry.{$toolSlug}");
@@ -99,6 +100,15 @@ class InstallApiController extends Controller
         $enforceLicense = $request->boolean('enforce_license');
         $license = null;
         $licenseToken = $request->input('license_token');
+
+        // For service tools with license, install_domain is required to ensure domain-specific licensing works
+        if ($isService && !empty($licenseToken)) {
+            $installDomain = $request->input('install_domain');
+            if (empty($installDomain)) {
+                return response()->json(['success' => false, 'message' => 'install_domain is required for licensed tools to ensure the license is bound to the correct website.'], 400);
+            }
+        }
+
         if ($isService && !$plainInstall) {
             $request->validate(['license_token' => 'required|string']);
             $validation = $this->licenseService->validate($licenseToken, $request->input('install_domain'));
